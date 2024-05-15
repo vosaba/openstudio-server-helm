@@ -14,6 +14,15 @@ spec:
         app: {{ .Values.redis.name  }}
         release: {{ .Release.Name }}
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nodegroup
+                    operator: In
+                    values:
+                      - web-group
       containers:
         - name: {{ .Values.redis.container.name  }}
           image: {{ .Values.redis.container.image  }}
@@ -21,9 +30,6 @@ spec:
             requests:
               cpu:  {{  .Values.redis.container.resources.requests.cpu  }}
               memory:  {{  .Values.redis.container.resources.requests.memory  }}
-            limits:
-              cpu:  {{  .Values.redis.container.resources.limits.cpu  }}
-              memory:  {{  .Values.redis.container.resources.limits.memory  }}
           ports:
             - containerPort: {{ .Values.redis.container.port  }}
           volumeMounts:

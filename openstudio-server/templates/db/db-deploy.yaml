@@ -19,6 +19,15 @@ spec:
         app: {{ .Values.db.name }}
         release: {{ .Release.Name }}
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nodegroup
+                    operator: In
+                    values:
+                      - web-group
       containers:
         - name: {{ .Values.db.container.name }}
           image: {{ .Values.db.container.image }}
@@ -31,9 +40,6 @@ spec:
             requests:
               cpu:  {{  .Values.db.container.resources.requests.cpu  }}
               memory:  {{  .Values.db.container.resources.requests.memory  }}
-            limits:
-              cpu:  {{  .Values.db.container.resources.limits.cpu  }}
-              memory:  {{  .Values.db.container.resources.limits.memory  }}
           env:
             - name: MONGO_INITDB_ROOT_USERNAME
               value: {{ .Values.db.username }}

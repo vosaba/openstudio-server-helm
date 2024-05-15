@@ -19,6 +19,15 @@ spec:
         app: {{ .Values.web.name  }}
         release: {{ .Release.Name }}
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nodegroup
+                    operator: In
+                    values:
+                      - web-group
       initContainers:
          - name: init-wait-for-db
            image: alpine
@@ -31,9 +40,6 @@ spec:
             requests:
               cpu:  {{  .Values.web.container.resources.requests.cpu  }}
               memory:  {{  .Values.web.container.resources.requests.memory  }}
-            limits:
-              cpu:  {{  .Values.web.container.resources.limits.cpu  }}
-              memory:  {{  .Values.web.container.resources.limits.memory  }}
           ports:
             - containerPort: {{ .Values.web.container.port.http  }}
             - containerPort: {{ .Values.web.container.port.https  }}
@@ -54,23 +60,24 @@ spec:
             - name: MONGO_PASSWORD
               value: {{ .Values.db.password }}
             - name: MAX_REQUESTS
-              value: {{ .Values.web.passenger_max_request_queue_size | quote }}
+              value: {{ (ceil (mulf .Values.worker_hpa.maxReplicas 1.05)) | quote }}
             - name: MAX_POOL
-              value: {{ .Values.web.passenger_max_pool_size | quote }}
+              value: {{ (ceil (divf (mulf (trimSuffix "Gi" .Values.web.container.resources.requests.memory) 1024 0.75) .Values.web.passenger_memory_per_process)) | quote }}
           command: ["bash", "-c", "/usr/local/bin/rails-entrypoint && /usr/local/bin/start-server"]
           readinessProbe:
             httpGet:
               path: /
               port: 80
             initialDelaySeconds: 60
-            periodSeconds: 30
+            periodSeconds: 200
+            timeoutSeconds: 120
             failureThreshold: 10
           livenessProbe:
             exec:
               command: ["grep", "-qs", "/mnt/openstudio ",  "/proc/mounts"]
             initialDelaySeconds: 5
-            periodSeconds: 30
-            timeoutSeconds: 30
+            periodSeconds: 200
+            timeoutSeconds: 120
             failureThreshold: 3
       priorityClassName: high-priority
       volumes:
