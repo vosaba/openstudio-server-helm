@@ -4,7 +4,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: openstudio-server
+  name: openstudio-server2
   region: us-east-1
   version: "1.29"
 

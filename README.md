@@ -96,13 +96,17 @@ example output of all pods running:
 
 ```bash
 NAME                                                       READY   STATUS    RESTARTS   AGE
-db-679f8c764c-52c2r                                        1/1     Running   0          109s
-openstudio-server-nfs-server-provisioner-d7b798757-bt4p7   1/1     Running   0          109s
-redis-7fd955fd84-2l4t4                                     1/1     Running   0          109s
-rserve-8699d8d9f6-zwkmj                                    1/1     Running   0          109s
-web-5b474c569d-wddhr                                       1/1     Running   0          109s
-web-background-84c868cd9d-24sbl                            1/1     Running   0          109s
-worker-cf755cccf-9twqw                                     1/1     Running   0          109s
+db-5ff59c484-hl468                                         1/1     Running   0          4m22s
+openstudio-server-nfs-server-provisioner-884774d4f-8pm4d   1/1     Running   0          4m22s
+redis-687fc94686-tkb9l                                     1/1     Running   0          4m22s
+rserve-67cb86849b-jph25                                    1/1     Running   0          4m22s
+web-694557fcc7-cd5q8                                       1/1     Running   0          4m22s
+web-background-6968ff9cd5-58hbn                            1/1     Running   0          4m22s
+worker-5cf4db9bbd-2pld8                                    1/1     Running   0          2m52s
+worker-5cf4db9bbd-6n4pz                                    1/1     Running   0          4m7s
+worker-5cf4db9bbd-bvv5z                                    1/1     Running   0          2m52s
+worker-5cf4db9bbd-sm9s7                                    1/1     Running   0          4m22s
+worker-5cf4db9bbd-z92xx                                    1/1     Running   0          2m52s
 ```
 You can see CPU and memory utilization by running:
 
@@ -113,14 +117,18 @@ kubectl top pods
 example output of all pods running:
 
 ```bash
-NAME                                                       READY   STATUS    RESTARTS   AGE
-db-679f8c764c-52c2r                                        1/1     Running   0          109s
-openstudio-server-nfs-server-provisioner-d7b798757-bt4p7   1/1     Running   0          109s
-redis-7fd955fd84-2l4t4                                     1/1     Running   0          109s
-rserve-8699d8d9f6-zwkmj                                    1/1     Running   0          109s
-web-5b474c569d-wddhr                                       1/1     Running   0          109s
-web-background-84c868cd9d-24sbl                            1/1     Running   0          109s
-worker-cf755cccf-9twqw                                     1/1     Running   0          109s
+NAME                                                       CPU(cores)   MEMORY(bytes)
+db-5ff59c484-hl468                                         4m           171Mi
+openstudio-server-nfs-server-provisioner-884774d4f-8pm4d   2m           110Mi
+redis-687fc94686-tkb9l                                     2m           2Mi
+rserve-67cb86849b-jph25                                    1m           78Mi
+web-694557fcc7-cd5q8                                       2m           421Mi
+web-background-6968ff9cd5-58hbn                            1m           182Mi
+worker-5cf4db9bbd-2pld8                                    1m           172Mi
+worker-5cf4db9bbd-6n4pz                                    1m           178Mi
+worker-5cf4db9bbd-bvv5z                                    1m           172Mi
+worker-5cf4db9bbd-sm9s7                                    1m           176Mi
+worker-5cf4db9bbd-z92xx                                    1m           172Mi
 ```
 Note that 1000m means one virtual CPU core.
 
@@ -133,7 +141,7 @@ AWS is the long domain (a0a4014d98f0211ea91cb06528280f48-1900622776.us-west-2.el
 ```bash
 $ kubectl get svc ingress-load-balancer
 NAME                    TYPE           CLUSTER-IP      EXTERNAL-IP                                                               PORT(S)                      AGE
-ingress-load-balancer   LoadBalancer   10.100.91.255   a0a4014d98f0211ea91cb06528280f48-1900622776.us-west-2.elb.amazonaws.com   80:31837/TCP,443:32347/TCP   3m51s
+ingress-load-balancer   LoadBalancer   10.100.246.21   a52e7c2e22f3940a8aa9d80b5220d468-1479205808.us-east-1.elb.amazonaws.com   80:32739/TCP,443:31344/TCP   5m56s
 ```
 
 Google is 35.247.75.9
