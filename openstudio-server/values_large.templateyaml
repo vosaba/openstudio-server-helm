@@ -30,8 +30,8 @@ db:
     image: "mongo:6.0.7"
     resources:
       requests:
-        cpu: 1
-        memory: "4Gi"
+        cpu: 4
+        memory: "22Gi"
     ports:
       db_port: 27017
   persistence:
@@ -60,8 +60,9 @@ nfs_pvc:
   name: "nfs-pvc"
   accessModes:
     - "ReadWriteMany"
-  storage_class: "nfs"
+  storage_class: ""
   storage: "500Gi"
+
 
 redis:
   name: "redis"
@@ -72,8 +73,8 @@ redis:
     image: "redis:6.0.9"
     resources:
       requests:
-        cpu: 0.25
-        memory: "1Gi"
+        cpu: 3
+        memory: "4Gi"
     port: 6379
   persistence:
     enabled: true
@@ -98,7 +99,7 @@ rserve:
     resources:
       requests:
         cpu: 1
-        memory: "2Gi"
+        memory: "1Gi"
 
 rserve_svc:
   name: "rserve"
@@ -114,8 +115,8 @@ web_background:
     image: "nrel/openstudio-server:3.7.0"
     resources:
       requests:
-        cpu: 0.25
-        memory: "512Mi"
+        cpu: 2
+        memory: "4Gi"
 
 web:
   name: "web"
@@ -131,8 +132,8 @@ web:
     image: "nrel/openstudio-server:3.7.0"
     resources:
       requests:
-        cpu: 1
-        memory: "2Gi"
+        cpu: 6
+        memory: "50Gi"
     port:
      http: 80
      https: 443
@@ -168,7 +169,7 @@ worker:
 worker_hpa:
   name: "worker"
   minReplicas: 2
-  maxReplicas: 20
+  maxReplicas: 3800
   targetCPUUtilizationPercentage: 12
   stabilizationWindowSeconds: 3600
 

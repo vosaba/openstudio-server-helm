@@ -29,9 +29,9 @@ spec:
                     values:
                       - web-group
       initContainers:
-         - name: init-wait-for-db
-           image: alpine
-           command: ["/bin/sh", "-c", "for i in $(seq 1 300); do nc -zvw1 {{  .Values.db.name  }} {{ .Values.db.container.ports.db_port }} && exit 0 || sleep 3; done; exit 1"]
+          - name: init-wait-for-db
+            image: alpine
+            command: ["/bin/sh", "-c", "for i in $(seq 1 300); do nc -zvw1 {{  .Values.db.name  }} {{ .Values.db.container.ports.db_port }} && exit 0 || sleep 3; done; exit 1"]
       containers:
         - name:  {{ .Values.web.container.name  }}
           image: {{ .Values.web.container.image  }}
@@ -81,6 +81,6 @@ spec:
             failureThreshold: 3
       priorityClassName: high-priority
       volumes:
-       - name: nfs
-         persistentVolumeClaim:
-           claimName: nfs-pvc
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: nfs-pvc

@@ -31,7 +31,7 @@ iam:
 
 managedNodeGroups:
   - name: web-node-group
-    instanceType: m7i.xlarge
+    instanceType: m7i.8xlarge
     minSize: 0
     maxSize: 2
     desiredCapacity: 1
@@ -55,9 +55,9 @@ managedNodeGroups:
     volumeType: gp3
 
   - name: worker-node-group
-    instanceType: c7i.xlarge
+    instanceType: c7i.24xlarge
     minSize: 0
-    maxSize: 3
+    maxSize: 50
     desiredCapacity: 1
     labels:
       nodegroup: worker-group

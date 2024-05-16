@@ -35,7 +35,7 @@ service:
   externalIPs: []
 
 persistence:
-  enabled: false
+  enabled: true
   name: nfs-pvc-data
   ## Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
@@ -52,7 +52,7 @@ persistence:
 
 ## For creating the StorageClass automatically:
 storageClass:
-  create: true
+  create: false
 
   ## Set a provisioner name. If unset, a name will be generated.
   # provisionerName:
@@ -85,9 +85,9 @@ rbac:
   serviceAccountName: default
 
 resources: 
-  requests:
-    cpu: 2
-    memory: 8Gi
+  # requests:
+  #   cpu: 2
+  #   memory: 8Gi
 
   # limits:
   #  cpu: 100m
@@ -97,4 +97,12 @@ nodeSelector: {}
 
 tolerations: []
 
-affinity: {}
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: nodegroup
+          operator: In
+          values:
+          - web-group

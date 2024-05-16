@@ -19,24 +19,10 @@ export AWS_SECRET_ACCESS_KEY="YOUR_AWS_SECRET_ACCESS_KEY"
 export AWS_DEFAULT_REGION="YOUR_AWS_DEFAULT_REGION"
 ```
 
-Below is an example that will create an AWS EKS cluster that has 3 nodes of instance type `t2.xlarge` with max nodes = 8. This cluster is set to autoscale up to this max node amount. You can change the instance type and min and max node setting to your use case. More info on [AWS instance types](https://aws.amazon.com/ec2/instance-types/)
+Below is an example that will create an AWS EKS cluster that has 2 node groups, one for web related pods and the other for worker pods. The web node group consists of 2 nodes of instance type `m7i.xlarge`. The worker node group consists of 1 node of instance type `c7i.xlarge` with max nodes = 6. This cluster is set to autoscale up to this max node amount. You can change the instance type and min and max node setting to your use case. More info on [AWS instance types](https://aws.amazon.com/ec2/instance-types/).
 
 ```bash
-eksctl create cluster \
-    --name openstudio-server \
-    --version 1.26 \
-    --region us-west-2 \
-    --nodegroup-name standard-workers \
-    --node-type t2.xlarge\
-    --nodes 3 \
-    --nodes-min 3 \
-    --nodes-max 8 \
-    --asg-access \
-    --ssh-access \
-    --ssh-public-key ~/.ssh/id_rsa.pub \
-    --zones=us-west-2a,us-west-2b,us-west-2d \
-    --managed \
-    --tags environment=production
+eksctl create cluster -f eks_config_small.yaml
 ```
 
 This is an example of the output you should see when you create the cluster:
@@ -78,43 +64,20 @@ This is an example of the output you should see when you create the cluster:
 [ℹ]  kubectl command should work with "/Users/tijcolem/.kube/config", try 'kubectl get nodes'
 [✔]  EKS cluster "openstudio-server" in "us-west-2" region is ready
 ```
+Below is an example that will create an AWS EKS cluster for large workloads. It still has 2 node groups, one for web related pods and the other for worker pods, but the instance types and the maximum number of nodes are larger. The web node group consists of 1 node of instance type `m7i.8xlarge` with max nodes = 2. The worker node group consists of 1 node of instance type `c7i.24xlarge` with max nodes = 50. This cluster is set to autoscale up to this max node amount. You can change the instance type and min and max node setting to your use case. More info on [AWS instance types](https://aws.amazon.com/ec2/instance-types/). Note that you will need to request an increase to your on demand instance type quota at the account level. Go to [EC2 Quota Dashboard](console.aws.amazon.com/servicequotas/home/services/ec2/quotas) and search for "on-demand standard". Then click on "Running On-Demand Standard (A, C, D, H, I, M, R, T, Z) instances". Finally click on "Request increase at account level", enter 4000 for "Increase quota value", and click "Request".
+
+```bash
+eksctl create cluster -f eks_config_large.yaml
+```
+Below is an example that will create an AWS EKS cluster for large workloads where the worker pods use spot instances. It still has 2 node groups, one for web related pods and the other for worker pods, but the instance types and the maximum number of nodes are larger. The web node group consists of 1 node of instance type `m7i.8xlarge` with max nodes = 2. The worker node group consists of 1 node of instance type `c7i.24xlarge` with max nodes = 50. This cluster is set to autoscale up to this max node amount. You can change the instance type and min and max node setting to your use case. More info on [AWS instance types](https://aws.amazon.com/ec2/instance-types/). Note that you will need to request an increase to your spot instance type quota at the account level. Go to [EC2 Quota Dashboard](console.aws.amazon.com/servicequotas/home/services/ec2/quotas) and search for "standard (A, C, D, H, I, M, R, T, Z) Spot". Then click on "All Standard (A, C, D, H, I, M, R, T, Z) Spot Instance Requests". Finally click on "Request increase at account level", enter 4000 for "Increase quota value", and click "Request".
+
+```bash
+eksctl create cluster -f eks_config_large-spot.yaml
+```
 
 ## EKS Add-On services
 
-As of Kubernetes version 1.23, to use EBS volumes you must install an EKS Add-On service called EBS CSI driver. Once the cluster is up and running, follow the steps posted on [AWS](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html)  to install the Add-On service. If this is a new cluster it should be a few commands to install. For example, below are the commands to add the Add-On feature for a new cluster using EKS v1.26
-
-1 ) Create an IAM OIDC identity provider for your cluster (replace "openstudio-server" if your cluster is named differently)
-`eksctl utils associate-iam-oidc-provider --cluster openstudio-server --approve`
-
-2 ) Create your Amazon EBS CSI plugin IAM role with eksctl (replace "openstudio-server" if your cluster is named differently). 
-
-```bash 
-eksctl create iamserviceaccount \
-  --name ebs-csi-controller-sa \
-  --namespace kube-system \
-  --cluster openstudio-server \
-  --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
-  --approve \
-  --role-only \
-  --role-name AmazonEKS_EBS_CSI_DriverRole
-```
-3 ) Install the Add-On (replace \<YOUR ACCOUNT ID\> with your account id). An easy way to get your account id is to run the following cmd `eksctl get cluster openstudio-server -o yaml | grep arn`
-```bash 
-eksctl create addon --name aws-ebs-csi-driver --cluster openstudio-server --service-account-role-arn arn:aws:iam::<YOUR ACCOUNT ID>:role/AmazonEKS_EBS_CSI_DriverRole --force
-```
-
-4 ) Update kubernetes cluster __and__ add-on version in aws console.
-If you see update option in eks console for cluster and/or add-on of EBS. Just update both. Otherwise could cause issue like:
-
-The pvc could be keeping pending forever.  
-
-If you do `kubectl describe pvc <pvc-id>` it may raise issue:  
-
-```bash
-caused by: AccessDenied: Not authorized to perform sts:AssumeRoleWithWebIdentity
-          status code: 403, request id: 60da95cf-c66e-471e-96a5-bd8915983baf
-```
-
+As of Kubernetes version 1.23, to use EBS volumes you must install an EKS Add-On service called EBS CSI driver. However, this step is now handled with the eksctl cluster config files.
 
 ## Connecting to your cluster using kubectl
 
@@ -147,5 +110,7 @@ It's always good idea to verify the cluster has been deleted.
 `eksctl get cluster`
 
 This cmd should return no clusters. You can also use the web console in your AWS account to verify as well.
+
+If the cluster didn't get fully deleted, go to [CloudFormation](console.aws.amazon.com/cloudformation) and manually delete the cluster stack.
 
 
