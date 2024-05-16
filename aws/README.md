@@ -77,7 +77,7 @@ eksctl create cluster -f eks_config_large-spot.yaml
 
 ## EKS Add-On services
 
-As of Kubernetes version 1.23, to use EBS volumes you must install an EKS Add-On service called EBS CSI driver. However, this step is now handled with the eksctl cluster config files.
+As of Kubernetes version 1.23, to use EBS volumes you must install an EKS Add-On service called EBS CSI driver. However, this step is now handled with the eksctl cluster config files. For example, in the `eks_config_small.yaml` file, these [lines of code](https://github.com/NREL/openstudio-server-helm/blob/large_projects/eks_config_small.yaml#L18-L30) handles most of the EKS Add-On Services that are required.
 
 ## Connecting to your cluster using kubectl
 

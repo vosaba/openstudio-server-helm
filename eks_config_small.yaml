@@ -23,11 +23,6 @@ iam:
       namespace: kube-system
     wellKnownPolicies:
       ebsCSIController: true
-  - metadata:
-      name: efs-csi-controller-sa
-      namespace: kube-system
-    wellKnownPolicies:
-      efsCSIController: true
 
 managedNodeGroups:
   - name: web-node-group
@@ -40,13 +35,10 @@ managedNodeGroups:
     privateNetworking: true
     iam:
       withAddonPolicies:
-        imageBuilder: true
         autoScaler: true
         externalDNS: true
         certManager: true
         ebs: true
-        fsx: true
-        efs: true
     ssh:
       allow: true
       # Update publicKeyPath for your public key
@@ -64,13 +56,10 @@ managedNodeGroups:
     privateNetworking: true
     iam:
       withAddonPolicies:
-        imageBuilder: true
         autoScaler: true
         externalDNS: true
         certManager: true
         ebs: true
-        fsx: true
-        efs: true
     ssh:
       allow: true
       # Update publicKeyPath for your public key
