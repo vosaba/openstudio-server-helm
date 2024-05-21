@@ -47,9 +47,11 @@ managedNodeGroups:
     volumeType: gp3
 
   - name: worker-node-group-spot
-    instanceTypes: ["c6i.2xlarge", "c5.2xlarge", "c6id.2xlarge", "c6in.2xlarge"]
+    instanceTypes: ["c5.metal", "c5a.24xlarge", "c5ad.24xlarge", "c5d.metal",
+    "c6a.24xlarge", "c6i.24xlarge", "c6id.24xlarge", "c6in.24xlarge",
+    "c7a.24xlarge", "c7i.24xlarge", "c7i.metal-24xl", "inf1.24xlarge"]
     minSize: 0
-    maxSize: 2
+    maxSize: 50
     desiredCapacity: 1
     labels:
       nodegroup: worker-group
