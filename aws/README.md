@@ -69,11 +69,25 @@ Below is an example that will create an AWS EKS cluster for large workloads. It 
 ```bash
 eksctl create cluster -f eks_config_large.yaml
 ```
-Below is an example that will create an AWS EKS cluster for large workloads where the worker pods use spot instances. It still has 2 node groups, one for web related pods and the other for worker pods, but the instance types and the maximum number of nodes are larger. The web node group consists of 1 node of instance type `m7i.8xlarge` with max nodes = 2. The worker node group consists of 1 node of instance type `c7i.24xlarge` with max nodes = 50. This cluster is set to autoscale up to this max node amount. You can change the instance type and min and max node setting to your use case. More info on [AWS instance types](https://aws.amazon.com/ec2/instance-types/). Note that you will need to request an increase to your spot instance type quota at the account level. Go to [EC2 Quota Dashboard](console.aws.amazon.com/servicequotas/home/services/ec2/quotas) and search for "standard (A, C, D, H, I, M, R, T, Z) Spot". Then click on "All Standard (A, C, D, H, I, M, R, T, Z) Spot Instance Requests". Finally click on "Request increase at account level", enter 4000 for "Increase quota value", and click "Request". Note that this configuration did appear to have some issues, so it may need to be revised.
+Below is an example that will create an AWS EKS cluster for large workloads where the worker pods use spot instances. It still has 2 node groups, one for web related pods and the other for worker pods, but the instance types and the maximum number of nodes are larger. The web node group consists of 1 node of instance type `m7i.8xlarge` with max nodes = 2. The worker node group consists of 1 node of instances from a list of instance types (see list below) with max nodes = 50. This cluster is set to autoscale up to this max node amount. You can change the instance type and min and max node setting to your use case. More info on [AWS instance types](https://aws.amazon.com/ec2/instance-types/). Note that you will need to request an increase to your spot instance type quota at the account level. Go to [EC2 Quota Dashboard](console.aws.amazon.com/servicequotas/home/services/ec2/quotas) and search for "standard (A, C, D, H, I, M, R, T, Z) Spot". Then click on "All Standard (A, C, D, H, I, M, R, T, Z) Spot Instance Requests". Finally click on "Request increase at account level", enter 4000 for "Increase quota value", and click "Request". Note that this eks config includes setting the availability zone for each of the managed node groups. The key thing to consider is that they should each be in separate availability zones.
 
 ```bash
 eksctl create cluster -f eks_config_large-spot.yaml
 ```
+
+### Worker Node Group Instances
+* c5.metal
+* c5a.24xlarge
+* c5ad.24xlarge
+* c5d.metal
+* c6a.24xlarge
+* c6i.24xlarge
+* c6id.24xlarge
+* c6in.24xlarge
+* c7a.24xlarge
+* c7i.24xlarge
+* c7i.metal-24xl
+* inf1.24xlarge
 
 ## EKS Add-On services
 

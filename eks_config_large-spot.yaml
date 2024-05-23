@@ -43,6 +43,7 @@ managedNodeGroups:
       allow: true
       # Update publicKeyPath for your public key
       publicKeyPath: ~/.ssh/id_rsa.pub
+    availabilityZones: ["us-east-1a"]
     volumeSize: 550
     volumeType: gp3
 
@@ -67,6 +68,7 @@ managedNodeGroups:
       allow: true
       # Update publicKeyPath for your public key
       publicKeyPath: ~/.ssh/id_rsa.pub
+    availabilityZones: ["us-east-1b"]
     volumeSize: 400
     volumeType: gp3
 
