@@ -60,8 +60,9 @@ nfs_pvc:
   name: "nfs-pvc"
   accessModes:
     - "ReadWriteMany"
-  storage_class: "nfs"
+  storage_class: ""
   storage: "500Gi"
+
 
 redis:
   name: "redis"

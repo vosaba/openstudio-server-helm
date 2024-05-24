@@ -88,12 +88,17 @@ resources: {}
   # limits:
   #  cpu: 100m
   #  memory: 128Mi
-  # requests:
-  #  cpu: 100m
-  #  memory: 128Mi
 
 nodeSelector: {}
 
 tolerations: []
 
-affinity: {}
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: nodegroup
+          operator: In
+          values:
+          - web-group

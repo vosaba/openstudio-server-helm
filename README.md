@@ -9,7 +9,7 @@ You can interface with the OpenStudio-server cluster using the [Parametric Analy
 
 ## Prerequisites
 
-- Kubernetes 1.22+ cluster. Please refer to cluster setup instructions for [google](/google/README.md) or [aws](/aws/README.md) for information on how to provision a cluster.
+- Kubernetes 1.29+ cluster. Please refer to cluster setup instructions for [google](/google/README.md) or [aws](/aws/README.md) for information on how to provision a cluster.
 - [helm client](https://helm.sh/docs/intro/install/) (v3.12.0 or higher)
 - [kubectl client](https://kubernetes.io/docs/tasks/tools/install-kubectl/) (v1.27.0 or higher)
 
@@ -40,7 +40,7 @@ helm install openstudio-server ./openstudio-server --set provider.name=azure
 To uninstall/delete the `openstudio-server` helm chart:
 
 ```bash
-helm delete openstudio-server
+helm uninstall openstudio-server
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release _including_ persistent volumes. See more about persistent volumes below.
@@ -81,7 +81,8 @@ web.container.image   | Container to run the web front-end. Can use a custom ima
 worker.container.image   | Container to run the worker. Can use a custom image to override default | nrel/openstudio-server::3.6.0 |
 rserve.container.image   | Container to run r server. Can use a custom image to override default | nrel/openstudio-rserve::3.6.0 |
 
-
+#### For Large Workloads
+Copy the text from inside the file `\openstudio-server\values_large.templateyaml` and paste it inside of `\openstudio-server\values.yaml`. Do this before using the `helm install ...` command.
 
 ## Accessing OpenStudio Server
 
@@ -95,14 +96,43 @@ example output of all pods running:
 
 ```bash
 NAME                                                       READY   STATUS    RESTARTS   AGE
-db-679f8c764c-52c2r                                        1/1     Running   0          109s
-openstudio-server-nfs-server-provisioner-d7b798757-bt4p7   1/1     Running   0          109s
-redis-7fd955fd84-2l4t4                                     1/1     Running   0          109s
-rserve-8699d8d9f6-zwkmj                                    1/1     Running   0          109s
-web-5b474c569d-wddhr                                       1/1     Running   0          109s
-web-background-84c868cd9d-24sbl                            1/1     Running   0          109s
-worker-cf755cccf-9twqw                                     1/1     Running   0          109s
+db-5ff59c484-hl468                                         1/1     Running   0          4m22s
+openstudio-server-nfs-server-provisioner-884774d4f-8pm4d   1/1     Running   0          4m22s
+redis-687fc94686-tkb9l                                     1/1     Running   0          4m22s
+rserve-67cb86849b-jph25                                    1/1     Running   0          4m22s
+web-694557fcc7-cd5q8                                       1/1     Running   0          4m22s
+web-background-6968ff9cd5-58hbn                            1/1     Running   0          4m22s
+worker-5cf4db9bbd-2pld8                                    1/1     Running   0          2m52s
+worker-5cf4db9bbd-6n4pz                                    1/1     Running   0          4m7s
+worker-5cf4db9bbd-bvv5z                                    1/1     Running   0          2m52s
+worker-5cf4db9bbd-sm9s7                                    1/1     Running   0          4m22s
+worker-5cf4db9bbd-z92xx                                    1/1     Running   0          2m52s
 ```
+You can see CPU and memory utilization by running:
+
+```bash
+kubectl top pods
+```
+
+example output of all pods running:
+
+```bash
+NAME                                                       CPU(cores)   MEMORY(bytes)
+db-5ff59c484-hl468                                         4m           171Mi
+openstudio-server-nfs-server-provisioner-884774d4f-8pm4d   2m           110Mi
+redis-687fc94686-tkb9l                                     2m           2Mi
+rserve-67cb86849b-jph25                                    1m           78Mi
+web-694557fcc7-cd5q8                                       2m           421Mi
+web-background-6968ff9cd5-58hbn                            1m           182Mi
+worker-5cf4db9bbd-2pld8                                    1m           172Mi
+worker-5cf4db9bbd-6n4pz                                    1m           178Mi
+worker-5cf4db9bbd-bvv5z                                    1m           172Mi
+worker-5cf4db9bbd-sm9s7                                    1m           176Mi
+worker-5cf4db9bbd-z92xx                                    1m           172Mi
+```
+Note that 1000m means one virtual CPU core.
+
+You can also add `watch` to the beginning of the command to see the output change over time.
 
 Once the cluster is up and running, you can use `kubectl` to determine the external IP or DN to access OpenStudio server and use this in PAT to connect to. For example, on AWS, a0a4014d98f0211ea91cb06528280f48-1900622776.us-west-2.elb.amazonaws.com is the external name. See the examples below for each cloud provider.
 
@@ -111,7 +141,7 @@ AWS is the long domain (a0a4014d98f0211ea91cb06528280f48-1900622776.us-west-2.el
 ```bash
 $ kubectl get svc ingress-load-balancer
 NAME                    TYPE           CLUSTER-IP      EXTERNAL-IP                                                               PORT(S)                      AGE
-ingress-load-balancer   LoadBalancer   10.100.91.255   a0a4014d98f0211ea91cb06528280f48-1900622776.us-west-2.elb.amazonaws.com   80:31837/TCP,443:32347/TCP   3m51s
+ingress-load-balancer   LoadBalancer   10.100.246.21   a52e7c2e22f3940a8aa9d80b5220d468-1479205808.us-east-1.elb.amazonaws.com   80:32739/TCP,443:31344/TCP   5m56s
 ```
 
 Google is 35.247.75.9
@@ -140,6 +170,6 @@ While it's possible to change the storage to use `Retain` vs `Delete`, the helm 
 
 ## Auto Scaling
 
-The worker pods are configured to auto-scale based on CPU threshold (default 50%). Once the aggregate CPU for all worker pods exceed the defined threshold (in this case 50%), the Kubernetes engine will start adding additional worker pods up to the maximum specified. This is also dependent on how the Kuebernetes cluster was configured as additional VM node instances will also be added. Please refer to the notes on [aws](/aws/README.md) and [google](/google/README.md) when setting up the cluster and note the instance type and maximum nodes specified.
+The worker pods are configured to auto-scale based on CPU threshold (default 12%). Once the aggregate CPU for all worker pods exceed the defined threshold (in this case 12%), the Kubernetes engine will start adding additional worker pods up to the maximum specified. This is also dependent on how the Kuebernetes cluster was configured as additional VM node instances will also be added. Please refer to the notes on [aws](/aws/README.md) and [google](/google/README.md) when setting up the cluster and note the instance type and maximum nodes specified.
 
-Once the aggregate CPU of the workers drop below 50%, the Kubernetes engine will start removing worker pod instances. There is a [prestop hook](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) configured in the worker pod to ensure that if a openstudio job is still active it will not terminate the pod until it is finished.
+Once the aggregate CPU of the workers drop below 12%, the Kubernetes engine will start removing worker pod instances. There is a [prestop hook](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) configured in the worker pod to ensure that if a openstudio job is still active it will not terminate the pod until it is finished.

@@ -19,6 +19,15 @@ spec:
         app: {{  .Values.web_background.name  }}
         release: {{ .Release.Name }}
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nodegroup
+                    operator: In
+                    values:
+                      - web-group
       containers:
         - name:  {{  .Values.web_background.container.name  }}
           image:  {{  .Values.web_background.container.image  }}
@@ -27,9 +36,6 @@ spec:
             requests:
               cpu:  {{  .Values.web_background.container.resources.requests.cpu  }}
               memory:  {{  .Values.web_background.container.resources.requests.memory  }}
-            limits:
-              cpu:  {{  .Values.web_background.container.resources.limits.cpu  }}
-              memory:  {{  .Values.web_background.container.resources.limits.memory  }}
           volumeMounts:
             - name: nfs
               mountPath: "/mnt/openstudio"

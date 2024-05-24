@@ -5,7 +5,7 @@ metadata:
 {{ if eq .Values.provider.name "aws" }}
 provisioner: kubernetes.io/aws-ebs
 parameters:
-  type: gp2
+  type: gp3
 {{ end }}
 {{ if eq .Values.provider.name "google" }}
 provisioner: kubernetes.io/gce-pd
@@ -22,3 +22,8 @@ reclaimPolicy: Delete
 mountOptions:
   - debug
 volumeBindingMode: Immediate
+allowedTopologies:
+- matchLabelExpressions:
+  - key: nodegroup
+    values:
+      - web-group
