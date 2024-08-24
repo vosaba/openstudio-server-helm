@@ -94,7 +94,7 @@ rserve:
   number_of_workers: "1"
   container:
     name: "rserve"
-    image: "nrel/openstudio-rserve:3.7.0"
+    image: "nrel/openstudio-rserve:3.8.0-1"
     resources:
       requests:
         cpu: 1
@@ -111,7 +111,7 @@ web_background:
   replicas: 1
   container:
     name: "web-background" 
-    image: "nrel/openstudio-server:3.7.0"
+    image: "nrel/openstudio-server:3.8.0-1"
     resources:
       requests:
         cpu: 0.25
@@ -128,7 +128,7 @@ web:
   passenger_memory_per_process: 250
   container:
     name: "web"
-    image: "nrel/openstudio-server:3.7.0"
+    image: "nrel/openstudio-server:3.8.0-1"
     resources:
       requests:
         cpu: 1
@@ -158,7 +158,7 @@ worker:
   label: "worker"
   container:
     name: "worker"
-    image: "nrel/openstudio-server:3.7.0"
+    image: "nrel/openstudio-server:3.8.0-1"
     resources:
       requests:
         cpu: 700m
