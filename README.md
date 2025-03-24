@@ -7,9 +7,11 @@
 This helm chart installs a OpenStudio-server instance (https://github.com/NREL/OpenStudio-server/) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 You can interface with the OpenStudio-server cluster using the [Parametric Analysis Tool](https://github.com/NREL/OpenStudio-PAT), which is part of the OpenStudio collection of software tools.
 
+Note that this repository has both information for small and large workloads in the cloud. Refer to the Large Workload section below and in the [aws README](/aws/README.md).
+
 ## Prerequisites
 
-- Kubernetes 1.29+ cluster. Please refer to cluster setup instructions for [google](/google/README.md) or [aws](/aws/README.md) for information on how to provision a cluster.
+- Kubernetes 1.27+ cluster. Please refer to cluster setup instructions for [google](/google/README.md) or [aws](/aws/README.md) for information on how to provision a cluster.
 - [helm client](https://helm.sh/docs/intro/install/) (v3.12.0 or higher)
 - [kubectl client](https://kubernetes.io/docs/tasks/tools/install-kubectl/) (v1.27.0 or higher)
 
@@ -69,20 +71,22 @@ helm install openstudio-server ./openstudio-server --set provider.name=azure --s
 
 Parameter | Description | Default
 --------- | ----------- | -------
-nfs-server-provisioner.persistence.size | Size of the volume for storing the data point results | 200Gi |
+nfs-server-provisioner.persistence.size | Size of the volume for storing the data point results | 550Gi |
 db.persistence.size | Size of the volume for MongoDB | 200Gi |
 cluster.name | Kubernetes AWS or Google cluster name. If you change the default name you need to set this name here otherwise AWS auto-scaling will not work correctly | openstudio-server |
-worker_hpa.minReplicas | Worker pods that run the simulations | 1 |
+worker_hpa.minReplicas | Worker pods that run the simulations | 2 |
 worker_hpa.maxReplicas | Maximum Worker pods that run the simulations | 20 |
 worker_hpa.targetCPUUtilizationPercentage | When aggregate CPU % of worker pods exceed threshold begin scaling. | 50 |
 web_background.replicas  | Number of projects/analyses to run in parallel. __*Note__ Algorithmic runs are currently not supported to run in parallel. Keep default value of 1 for these types of analyses.  | 1 |
-web_background.container.image  | Container to run the web background. Can use a custom image to override default | nrel/openstudio-server:3.6.0 |
-web.container.image   | Container to run the web front-end. Can use a custom image to override default | nrel/openstudio-server::3.6.0 |
-worker.container.image   | Container to run the worker. Can use a custom image to override default | nrel/openstudio-server::3.6.0 |
-rserve.container.image   | Container to run r server. Can use a custom image to override default | nrel/openstudio-rserve::3.6.0 |
+web_background.container.image  | Container to run the web background. Can use a custom image to override default | nrel/openstudio-server:3.7.0 |
+web.container.image   | Container to run the web front-end. Can use a custom image to override default | nrel/openstudio-server:3.7.0 |
+worker.container.image   | Container to run the worker. Can use a custom image to override default | nrel/openstudio-server:3.7.0 |
+rserve.container.image   | Container to run r server. Can use a custom image to override default | nrel/openstudio-rserve:3.7.0 |
 
 #### For Large Workloads
-Copy the text from inside the file `\openstudio-server\values_large.templateyaml` and paste it inside of `\openstudio-server\values.yaml`. Do this before using the `helm install ...` command.
+Copy the text from inside the [large template values file](/openstudio-server/values_large.templateyaml)] and paste it inside of the [values file](/openstudio-server/values.yaml). Do this before using the `helm install ...` command.
+
+Additionally, note that with large workloads you may have issues with downloading container images from Docker Hub if you have a lot of worker nodes. Therefore, you may want to upload the container images into the cloud's container registry and then update the container image path in the [values file](/openstudio-server/values.yaml). This [article](https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-ecr-image.html#:~:text=Identify%20the%20local%20image%20to,container%20images%20on%20your%20system.&text=You%20can%20identify%20an%20image,tag%20name%20combination%20to%20use.) has instructions on how to do this for aws' Elastic Container Registry (ECR).
 
 ## Accessing OpenStudio Server
 
@@ -139,7 +143,12 @@ Once the cluster is up and running, you can use `kubectl` to determine the exter
 AWS is the long domain (a0a4014d98f0211ea91cb06528280f48-1900622776.us-west-2.elb.amazonaws.com)
 
 ```bash
-$ kubectl get svc ingress-load-balancer
+kubectl get svc ingress-load-balancer
+```
+
+example output:
+
+```bash
 NAME                    TYPE           CLUSTER-IP      EXTERNAL-IP                                                               PORT(S)                      AGE
 ingress-load-balancer   LoadBalancer   10.100.246.21   a52e7c2e22f3940a8aa9d80b5220d468-1479205808.us-east-1.elb.amazonaws.com   80:32739/TCP,443:31344/TCP   5m56s
 ```
@@ -147,7 +156,12 @@ ingress-load-balancer   LoadBalancer   10.100.246.21   a52e7c2e22f3940a8aa9d80b5
 Google is 35.247.75.9
 
 ```bash
-$ kubectl get svc ingress-load-balancer
+kubectl get svc ingress-load-balancer
+```
+
+example output:
+
+```bash
 NAME                    TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
 ingress-load-balancer   LoadBalancer   10.55.246.197   35.247.75.9   80:32613/TCP,443:31562/TCP   35m
 ```
@@ -155,7 +169,12 @@ ingress-load-balancer   LoadBalancer   10.55.246.197   35.247.75.9   80:32613/TC
 Azure is 20.190.10.17
 
 ```bash
-$ kubectl get svc ingress-load-balancer
+kubectl get svc ingress-load-balancer
+```
+
+example output:
+
+```bash
 NAME                                       TYPE           CLUSTER-IP    EXTERNAL-IP    PORT(S)  AGE
 ingress-load-balancer                      LoadBalancer   10.0.248.18   20.190.10.17   80:31879/TCP 443:30780/TCP 3m53s
 ```
