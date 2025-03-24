@@ -1,4 +1,4 @@
-{{- if not (lookup "rbac.authorization.k8s.io/v1" "ClusterRoleBinding" "" "fabric8-rbac") }}
+{{- if .Values.nfs.deploy_cluster_role }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:

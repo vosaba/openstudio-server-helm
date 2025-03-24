@@ -1,4 +1,4 @@
-{{- if not (lookup "scheduling.k8s.io/v1" "PriorityClass" "" "low-priority") }}
+{{- if .Values.priority_class.deploy }}
 apiVersion: scheduling.k8s.io/v1
 kind: PriorityClass
 metadata:

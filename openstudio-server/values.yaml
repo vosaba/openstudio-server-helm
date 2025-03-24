@@ -11,11 +11,14 @@ cluster:
   name: "openstudio-server"
 
 nfs-server-provisioner:
+  rbac:
+    create: true
   persistence:
     enabled: true
     storageClass: "ssd"
     size: 550Gi
   storageClass:
+    create: true
     allowVolumeExpansion: false
     mountOptions:
       - vers=4
@@ -56,6 +59,7 @@ load_balancer:
 
 nfs:
   name: "nfs"
+  deploy_cluster_role: true
 
 nfs_pvc:
   name: "nfs-pvc"
@@ -173,5 +177,8 @@ worker_hpa:
   targetCPUUtilizationPercentage: 50
   stabilizationWindowSeconds: 3600
 
+storage_class:
+  deploy: true
 
-
+priority_class:
+  deploy: true
